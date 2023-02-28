@@ -52,7 +52,7 @@ if __name__ == '__main__':
         from engines.predict import Predict
         predict = Predict(device, logger)
         schema = ['时间', '地点', '人物']
-        predict.predict_one('通知我周三下午三点参加在华观广场B座的笔试', schema)
+        predict.predict_one('warm up', schema)
         while True:
             logger.logger.info('please input a sentence (enter [exit] to exit.)')
             sentence = input()

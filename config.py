@@ -36,7 +36,7 @@ configure = {
     'max_sequence_length': 512,
     'position_prob': 0.5,
     # 分割句子
-    'split_sentence': False,
+    'split_sentence': True,
     # 随机种子
     'seed': 1000,
     'use_fp16': False,

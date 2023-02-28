@@ -3,6 +3,7 @@ from engines.utils.setup_seed import set_seed
 from config import use_cuda, cuda_device, configure, mode
 import torch
 import json
+import time
 import os
 
 
@@ -59,6 +60,9 @@ if __name__ == '__main__':
             if sentence == 'exit':
                 break
             logger.logger.info('input:{}'.format(str(sentence)))
+            start_time = time.time()
             result = predict.predict_one(sentence, schema)
-            logger.logger.info('putput:{}'.format(str(result)))
+            time_cost = (time.time() - start_time) * 1000
+            logger.logger.info('putput:{}, cost {}(ms).'.format(str(result), time_cost))
             print(result)
+            print('time consumption: %.3f(ms)' % time_cost)

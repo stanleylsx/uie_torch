@@ -19,10 +19,9 @@ import torch
 from torch.utils.data import DataLoader
 from engines.utils.tqdm_util import tqdm, logging_redirect_tqdm
 from engines.data import IEDataset
-from engines.models.uie import UIE
+from engines.models.uie import UIE, UIEM
 from engines.utils.span_evaluator import SpanEvaluator
 from engines.utils.early_stop import EarlyStopping
-from transformers import BertTokenizerFast
 from config import show_bar, configure, mode
 
 
@@ -40,9 +39,17 @@ class Train:
         self.logging_steps = configure['print_per_batch']
         self.valid_steps = configure['valid_steps']
         self.max_model_num = configure['max_model_num']
+        self.multilingual = configure['multilingual']
         model_type = configure['model_type']
         self.model_path = os.path.join(model_type, 'torch')
-        self.tokenizer = BertTokenizerFast.from_pretrained(self.model_path)
+
+        if self.multilingual:
+            from engines.utils.tokenizer import ErnieMTokenizerFast
+            self.tokenizer = ErnieMTokenizerFast.from_pretrained(self.model_path)
+        else:
+            from transformers import BertTokenizerFast
+            self.tokenizer = BertTokenizerFast.from_pretrained(self.model_path)
+
         self.metric = SpanEvaluator()
         self.criterion = torch.nn.functional.binary_cross_entropy
         if mode == 'train' and configure['is_early_stop']:
@@ -59,7 +66,11 @@ class Train:
                                            save_dir=self.early_stopping_save_dir)
 
     def train(self):
-        model = UIE.from_pretrained(self.model_path).to(self.device)
+        if self.multilingual:
+            model = UIEM.from_pretrained(self.model_path).to(self.device)
+        else:
+            model = UIE.from_pretrained(self.model_path).to(self.device)
+
         train_ds = IEDataset(self.train_path, tokenizer=self.tokenizer, max_seq_len=self.max_seq_len)
         dev_ds = IEDataset(self.dev_path, tokenizer=self.tokenizer, max_seq_len=self.max_seq_len)
         train_data_loader = DataLoader(train_ds, batch_size=self.batch_size, shuffle=True)

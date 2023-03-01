@@ -404,26 +404,18 @@ class Predict:
 
         start_probs = []
         end_probs = []
-        for batch_start in range(0, len(texts), self.batch_size):
-            input_ids = encoded_inputs['input_ids'][batch_start:batch_start + self.batch_size]
-            token_type_ids = encoded_inputs['token_type_ids'][batch_start:batch_start + self.batch_size]
-            attention_mask = encoded_inputs['attention_mask'][batch_start:batch_start + self.batch_size]
-            offset_maps = encoded_inputs['offset_mapping'][batch_start:batch_start + self.batch_size]
+        for idx in range(0, len(texts), self.batch_size):
+            l, r = idx, idx + self.batch_size
             if self.multilingual:
-                input_ids = np.array(input_ids, dtype='int64')
-                attention_mask = np.array(attention_mask, dtype='int64')
-                position_ids = (np.cumsum(np.ones_like(input_ids), axis=1)
-                                - np.ones_like(input_ids)) * attention_mask
                 input_dict = {
-                    'input_ids': input_ids,
-                    'attention_mask': attention_mask,
-                    'position_ids': position_ids
+                    'input_ids': encoded_inputs['input_ids'][l:r].astype('int64'),
+                    'position_ids': encoded_inputs['position_ids'][l:r].astype('int64'),
                 }
             else:
                 input_dict = {
-                    'input_ids': np.array(input_ids, dtype='int64'),
-                    'token_type_ids': np.array(token_type_ids, dtype='int64'),
-                    'attention_mask': np.array(attention_mask, dtype='int64')
+                    'input_ids': encoded_inputs['input_ids'][l:r].astype('int64'),
+                    'token_type_ids': encoded_inputs['token_type_ids'][l:r].astype('int64'),
+                    'attention_mask': encoded_inputs['attention_mask'][l:r].astype('int64'),
                 }
             start_prob, end_prob = self.inference_backend(input_dict)
             start_prob = start_prob.tolist()

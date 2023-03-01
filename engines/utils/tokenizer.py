@@ -11,7 +11,6 @@ from fast_tokenizer import Tokenizer, normalizers, pretokenizers, postprocessors
 from fast_tokenizer.models import BPE, Unigram
 from transformers.tokenization_utils import AddedToken, PreTrainedTokenizer
 from transformers.utils import SPIECE_UNDERLINE
-from utils import logger
 
 
 VOCAB_FILES_NAMES = {
@@ -332,7 +331,7 @@ class ErnieMTokenizer(PreTrainedTokenizer):
 
     def save_vocabulary(self, save_directory: str, filename_prefix: Optional[str] = None):
         if not os.path.isdir(save_directory):
-            logger.error(f"Vocabulary path ({save_directory}) should be a directory")
+            print(f"Vocabulary path ({save_directory}) should be a directory")
             exit(1)
         sentencepiece_model_file = os.path.join(
             save_directory, (filename_prefix + "-" if filename_prefix else "") +
@@ -352,7 +351,7 @@ class ErnieMTokenizer(PreTrainedTokenizer):
         with open(vocab_file, "w", encoding="utf-8") as writer:
             for token, token_index in sorted(self.vocab.items(), key=lambda kv: kv[1]):
                 if index != token_index:
-                    logger.warning(
+                    print(
                         f"Saving vocabulary to {vocab_file}: vocabulary indices are not consecutive."
                         " Please check that the vocabulary is not corrupted!"
                     )

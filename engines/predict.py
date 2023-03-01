@@ -6,7 +6,6 @@ from engines.utils.span_evaluator import get_bool_ids_greater_than, get_span
 from engines.data import unify_prompt_name, get_relation_type_dict, IEMapDataset, get_id_and_prob
 from config import configure
 from itertools import chain
-import numpy as np
 import torch
 import math
 import os
@@ -372,7 +371,8 @@ class Predict:
             prompts.append(inputs[i]['prompt'])
         # max predict length should exclude the length of prompt and summary tokens
         max_predict_len = self.max_seq_len - len(max(prompts)) - 3
-        short_input_texts, self.input_mapping = self._auto_splitter(input_texts, max_predict_len, split_sentence=False)
+        short_input_texts, self.input_mapping = self._auto_splitter(input_texts, max_predict_len,
+                                                                    split_sentence=self.split_sentence)
 
         short_texts_prompts = []
         for k, v in self.input_mapping.items():

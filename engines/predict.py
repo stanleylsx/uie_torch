@@ -8,7 +8,6 @@ from config import configure
 from itertools import chain
 import numpy as np
 import torch
-import re
 import math
 import os
 
@@ -194,18 +193,18 @@ class Predict:
         results = self._multi_stage_predict(texts)
         return results
 
-    def _multi_stage_predict(self, datas):
+    def _multi_stage_predict(self, data):
         """
         Traversal the schema tree and do multi-stage prediction.
         Args:
-            datas (list): a list of strings
+            data (list): a list of strings
         Returns:
             list: a list of predictions, where the list's length
-                equals to the length of `datas`
+                equals to the length of `data`
         """
-        results = [{} for _ in range(len(datas))]
+        results = [{} for _ in range(len(data))]
         # input check to early return
-        if len(datas) < 1 or self._schema_tree is None:
+        if len(data) < 1 or self._schema_tree is None:
             return results
 
         # copy to stay `self._schema_tree` unchanged
@@ -217,36 +216,18 @@ class Predict:
             cnt = 0
             idx = 0
             if not node.prefix:
-                for data in datas:
-                    examples.append({
-                        'text': data,
-                        'prompt': dbc2sbc(node.name)
-                    })
+                for one_data in data:
+                    examples.append({'text': one_data, 'prompt': dbc2sbc(node.name)})
                     input_map[cnt] = [idx]
                     idx += 1
                     cnt += 1
             else:
-                for pre, data in zip(node.prefix, datas):
+                for pre, one_data in zip(node.prefix, data):
                     if len(pre) == 0:
                         input_map[cnt] = []
                     else:
                         for p in pre:
-                            if self.is_en:
-                                if re.search(r'\[.*?\]$', node.name):
-                                    prompt_prefix = node.name[:node.name.find(
-                                        "[", 1)].strip()
-                                    cls_options = re.search(
-                                        r'\[.*?\]$', node.name).group()
-                                    # Sentiment classification of xxx [positive, negative]
-                                    prompt = prompt_prefix + p + " " + cls_options
-                                else:
-                                    prompt = node.name + p
-                            else:
-                                prompt = p + node.name
-                            examples.append({
-                                'text': data,
-                                'prompt': dbc2sbc(prompt)
-                            })
+                            examples.append({'text': one_data, 'prompt': dbc2sbc(p + node.name)})
                         input_map[cnt] = [i + idx for i in range(len(pre))]
                         idx += len(pre)
                     cnt += 1
@@ -256,7 +237,7 @@ class Predict:
                 result_list = self._single_stage_predict(examples)
 
             if not node.parent_relations:
-                relations = [[] for i in range(len(datas))]
+                relations = [[] for i in range(len(data))]
                 for k, v in input_map.items():
                     for idx in v:
                         if len(result_list[idx]) == 0:
@@ -274,18 +255,12 @@ class Predict:
                         if len(result_list[v[i]]) == 0:
                             continue
                         if 'relations' not in relations[k][i].keys():
-                            relations[k][i]['relations'] = {
-                                node.name: result_list[v[i]]
-                            }
-                        elif node.name not in relations[k][i]['relations'].keys(
-                        ):
-                            relations[k][i]['relations'][
-                                node.name] = result_list[v[i]]
+                            relations[k][i]['relations'] = {node.name: result_list[v[i]]}
+                        elif node.name not in relations[k][i]['relations'].keys():
+                            relations[k][i]['relations'][node.name] = result_list[v[i]]
                         else:
-                            relations[k][i]['relations'][node.name].extend(
-                                result_list[v[i]])
-
-                new_relations = [[] for i in range(len(datas))]
+                            relations[k][i]['relations'][node.name].extend(result_list[v[i]])
+                new_relations = [[] for i in range(len(data))]
                 for i in range(len(relations)):
                     for j in range(len(relations[i])):
                         if 'relations' in relations[i][j].keys() and node.name in relations[i][j]['relations'].keys():
@@ -293,14 +268,14 @@ class Predict:
                                 new_relations[i].append(relations[i][j]['relations'][node.name][k])
                 relations = new_relations
 
-            prefix = [[] for _ in range(len(datas))]
+            prefix = [[] for _ in range(len(data))]
             for k, v in input_map.items():
                 for idx in v:
                     for i in range(len(result_list[idx])):
                         if self.is_en:
-                            prefix[k].append(" of " + result_list[idx][i]["text"])
+                            prefix[k].append(' of ' + result_list[idx][i]['text'])
                         else:
-                            prefix[k].append(result_list[idx][i]["text"] + "的")
+                            prefix[k].append(result_list[idx][i]['text'] + '的')
 
             for child in node.children:
                 child.prefix = prefix
@@ -397,45 +372,48 @@ class Predict:
             prompts.append(inputs[i]['prompt'])
         # max predict length should exclude the length of prompt and summary tokens
         max_predict_len = self.max_seq_len - len(max(prompts)) - 3
-
-        short_input_texts, self.input_mapping = self._auto_splitter(
-            input_texts, max_predict_len, split_sentence=self.split_sentence)
+        short_input_texts, self.input_mapping = self._auto_splitter(input_texts, max_predict_len, split_sentence=False)
 
         short_texts_prompts = []
         for k, v in self.input_mapping.items():
             short_texts_prompts.extend([prompts[k] for i in range(len(v))])
-        short_inputs = [{'text': short_input_texts[i], 'prompt': short_texts_prompts[i]
-                         } for i in range(len(short_input_texts))]
+        short_inputs = [
+            {'text': short_input_texts[i], 'prompt': short_texts_prompts[i]} for i in range(len(short_input_texts))
+        ]
 
-        offset_maps = []
-
+        prompts = []
+        texts = []
+        for s in short_inputs:
+            prompts.append(s['prompt'])
+            texts.append(s['text'])
         if self.multilingual:
             padding_type = 'max_length'
         else:
             padding_type = 'longest'
         encoded_inputs = self.tokenizer(
-            text=short_texts_prompts,
-            text_pair=short_input_texts,
-            stride=2,
+            text=prompts,
+            text_pair=texts,
             truncation=True,
             max_length=self.max_seq_len,
             padding=padding_type,
             add_special_tokens=True,
+            return_tensors='np',
             return_offsets_mapping=True,
-            return_tensors='np')
+        )
+        offset_maps = encoded_inputs['offset_mapping']
 
-        start_prob_concat, end_prob_concat = [], []
-        input_dict = {}
-        for batch_start in range(0, len(short_input_texts), self.batch_size):
-            input_ids = encoded_inputs['input_ids'][batch_start:batch_start+self.batch_size]
-            token_type_ids = encoded_inputs['token_type_ids'][batch_start:batch_start+self.batch_size]
-            attention_mask = encoded_inputs['attention_mask'][batch_start:batch_start+self.batch_size]
-            offset_maps = encoded_inputs['offset_mapping'][batch_start:batch_start+self.batch_size]
+        start_probs = []
+        end_probs = []
+        for batch_start in range(0, len(texts), self.batch_size):
+            input_ids = encoded_inputs['input_ids'][batch_start:batch_start + self.batch_size]
+            token_type_ids = encoded_inputs['token_type_ids'][batch_start:batch_start + self.batch_size]
+            attention_mask = encoded_inputs['attention_mask'][batch_start:batch_start + self.batch_size]
+            offset_maps = encoded_inputs['offset_mapping'][batch_start:batch_start + self.batch_size]
             if self.multilingual:
                 input_ids = np.array(input_ids, dtype='int64')
                 attention_mask = np.array(attention_mask, dtype='int64')
                 position_ids = (np.cumsum(np.ones_like(input_ids), axis=1)
-                                - np.ones_like(input_ids))*attention_mask
+                                - np.ones_like(input_ids)) * attention_mask
                 input_dict = {
                     'input_ids': input_ids,
                     'attention_mask': attention_mask,
@@ -445,27 +423,21 @@ class Predict:
                 input_dict = {
                     'input_ids': np.array(input_ids, dtype='int64'),
                     'token_type_ids': np.array(token_type_ids, dtype='int64'),
-                    'attention_mask': np.array(attention_mask, dtype='int64')}
+                    'attention_mask': np.array(attention_mask, dtype='int64')
+                }
+            start_prob, end_prob = self.inference_backend(input_dict)
+            start_prob = start_prob.tolist()
+            end_prob = end_prob.tolist()
+            start_probs.extend(start_prob)
+            end_probs.extend(end_prob)
+        start_ids_list = get_bool_ids_greater_than(start_probs, limit=self.position_prob, return_prob=True)
+        end_ids_list = get_bool_ids_greater_than(end_probs, limit=self.position_prob, return_prob=True)
 
-            outputs = self.inference_backend(input_dict)
-            start_prob, end_prob = outputs[0], outputs[1]
-            start_prob_concat.append(start_prob)
-            end_prob_concat.append(end_prob)
-        start_prob_concat = np.concatenate(start_prob_concat)
-        end_prob_concat = np.concatenate(end_prob_concat)
-
-        start_ids_list = get_bool_ids_greater_than(start_prob_concat, limit=self.position_prob, return_prob=True)
-        end_ids_list = get_bool_ids_greater_than(end_prob_concat, limit=self.position_prob, return_prob=True)
-
-        input_ids = input_dict['input_ids']
         sentence_ids = []
         probs = []
-        for start_ids, end_ids, ids, offset_map in zip(start_ids_list, end_ids_list, input_ids.tolist(), offset_maps):
-            for i in reversed(range(len(ids))):
-                if ids[i] != 0:
-                    break
+        for start_ids, end_ids, offset_map in zip(start_ids_list, end_ids_list, offset_maps.tolist()):
             span_list = get_span(start_ids, end_ids, with_prob=True)
-            sentence_id, prob = get_id_and_prob(span_list, offset_map.tolist())
+            sentence_id, prob = get_id_and_prob(span_list, offset_map)
             sentence_ids.append(sentence_id)
             probs.append(prob)
 

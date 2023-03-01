@@ -6,6 +6,7 @@ from engines.utils.span_evaluator import get_bool_ids_greater_than, get_span
 from engines.data import unify_prompt_name, get_relation_type_dict, IEMapDataset, get_id_and_prob
 from config import configure
 from itertools import chain
+import numpy as np
 import torch
 import math
 import os
@@ -406,16 +407,22 @@ class Predict:
         end_probs = []
         for idx in range(0, len(texts), self.batch_size):
             l, r = idx, idx + self.batch_size
+            input_ids = encoded_inputs['input_ids'][l:r]
+            token_type_ids = encoded_inputs['token_type_ids'][l:r]
+            attention_mask = encoded_inputs['attention_mask'][l:r]
             if self.multilingual:
+                input_ids = np.array(input_ids, dtype="int64")
+                attention_mask = np.array(attention_mask, dtype="int64")
+                position_ids = (np.cumsum(np.ones_like(input_ids), axis=1) - np.ones_like(input_ids)) * attention_mask
                 input_dict = {
-                    'input_ids': encoded_inputs['input_ids'][l:r].astype('int64'),
-                    'position_ids': encoded_inputs['position_ids'][l:r].astype('int64'),
+                    'input_ids': input_ids.astype('int64'),
+                    'position_ids': position_ids.astype('int64'),
                 }
             else:
                 input_dict = {
-                    'input_ids': encoded_inputs['input_ids'][l:r].astype('int64'),
-                    'token_type_ids': encoded_inputs['token_type_ids'][l:r].astype('int64'),
-                    'attention_mask': encoded_inputs['attention_mask'][l:r].astype('int64'),
+                    'input_ids': input_ids.astype('int64'),
+                    'token_type_ids': token_type_ids.astype('int64'),
+                    'attention_mask': attention_mask.astype('int64'),
                 }
             start_prob, end_prob = self.inference_backend(input_dict)
             start_prob = start_prob.tolist()

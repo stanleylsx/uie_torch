@@ -230,21 +230,22 @@ class IEMapDataset(Dataset):
 
 def get_id_and_prob(spans, offset_map):
     prompt_length = 0
+    prompt_char_length = 0
     for i in range(1, len(offset_map)):
         if offset_map[i] != [0, 0]:
-            prompt_length += 1
+            prompt_length += 1  # prompt 包含的 token 数
+            prompt_char_length = offset_map[i][-1]
         else:
             break
 
     for i in range(1, prompt_length + 1):
-        offset_map[i][0] -= (prompt_length + 1)
-        offset_map[i][1] -= (prompt_length + 1)
+        offset_map[i][0] -= (prompt_char_length + 1)
+        offset_map[i][1] -= (prompt_char_length + 1)
 
     sentence_id = []
     prob = []
     for start, end in spans:
         prob.append(start[1] * end[1])
-        sentence_id.append(
-            (offset_map[start[0]][0], offset_map[end[0]][1]))
+        sentence_id.append((offset_map[start[0]][0], offset_map[end[0]][1]))
     return sentence_id, prob
 

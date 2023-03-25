@@ -52,8 +52,7 @@ if __name__ == '__main__':
     elif mode == 'interactive_predict':
         from engines.predict import Predict
         predict = Predict(device, logger)
-        schema = ['时间', '地点', '人物']
-        predict.predict_one('warm up', schema)
+        predict.predict_one('warm up')
         while True:
             logger.logger.info('please input a sentence (enter [exit] to exit.)')
             sentence = input()
@@ -61,7 +60,7 @@ if __name__ == '__main__':
                 break
             logger.logger.info('input:{}'.format(str(sentence)))
             start_time = time.time()
-            result = predict.predict_one(sentence, schema)
+            result = predict.predict_one(sentence)
             time_cost = (time.time() - start_time) * 1000
             logger.logger.info('putput:{}, cost {}(ms).'.format(str(result), time_cost))
             print(result)

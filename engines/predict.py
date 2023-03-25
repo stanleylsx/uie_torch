@@ -20,6 +20,7 @@ class Predict:
         self.batch_size = configure['batch_size']
         self.position_prob = configure['position_prob']
         self.engine = configure['engine']
+        self.schema = configure['schema']
         checkpoints_dir = configure['checkpoints_dir']
         model_type = configure['model_type']
         if configure['is_early_stop']:
@@ -114,8 +115,8 @@ class Predict:
 
         self.debug = False
 
-    def predict_one(self, inputs, schema):
-        self.set_schema(schema)
+    def predict_one(self, inputs):
+        self.set_schema()
         texts = inputs
         if isinstance(texts, str):
             texts = [texts]
@@ -181,10 +182,10 @@ class Predict:
                 self.logger.info('Class Name: X的%s' % key)
                 self.logger.info('Evaluation Precision: %.5f | Recall: %.5f | F1: %.5f' % (precision, recall, f1))
 
-    def set_schema(self, schema):
-        if isinstance(schema, dict) or isinstance(schema, str):
-            schema = [schema]
-        self._schema_tree = self._build_tree(schema)
+    def set_schema(self):
+        if isinstance(self.schema, dict) or isinstance(self.schema, str):
+            schema = [self.schema]
+        self._schema_tree = self._build_tree(self.schema)
 
     def __call__(self, inputs):
         texts = inputs

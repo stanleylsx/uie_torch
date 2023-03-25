@@ -19,7 +19,7 @@ show_bar = True
 
 configure = {
     # prompt schema
-    'schema': ['时间', '选手', '赛事名称'],
+    'schema': ['出发地', '目的地', '费用', '时间'],
     'model_type': 'uie-base',
     # 训练数据集
     'train_file': 'datasets/train.txt',

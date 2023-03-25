@@ -1,6 +1,7 @@
 from engines.utils.logger import Logger
 from engines.utils.setup_seed import set_seed
 from config import use_cuda, cuda_device, configure, mode
+from pprint import pprint
 import torch
 import json
 import time
@@ -55,6 +56,7 @@ if __name__ == '__main__':
         predict.predict_one('warm up')
         while True:
             logger.logger.info('please input a sentence (enter [exit] to exit.)')
+            print('please input a sentence (enter [exit] to exit.)')
             sentence = input()
             if sentence == 'exit':
                 break
@@ -63,5 +65,5 @@ if __name__ == '__main__':
             result = predict.predict_one(sentence)
             time_cost = (time.time() - start_time) * 1000
             logger.logger.info('putput:{}, cost {}(ms).'.format(str(result), time_cost))
-            print(result)
+            pprint(result)
             print('time consumption: %.3f(ms)' % time_cost)

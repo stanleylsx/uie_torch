@@ -1,11 +1,10 @@
 fast-tokenizer-python==1.0.2
 sentencepiece==0.1.97
-transformers==4.26.1
-onnxruntime-gpu==1.14.0
-tqdm==4.64.1
+transformers==4.27.3
+onnxruntime-gpu==1.14.1
+tqdm==4.65.0
 torch==1.13.1
 torchaudio==0.13.1
 torchvision==0.14.1
 six==1.16.0
 colorlog==6.7.0
-colorama==0.4.6

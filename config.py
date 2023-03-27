@@ -9,6 +9,7 @@
 # train:                训练UIE
 # interactive_predict:  交互模式
 # test:                 跑测试集
+# export_torch:         转torch
 mode = 'interactive_predict'
 
 # 使用GPU设备
@@ -19,8 +20,8 @@ show_bar = True
 
 configure = {
     # prompt schema
-    'schema': ['出发地', '目的地', '费用', '时间'],
-    'model_type': 'uie-base',
+    'schema': [{"评价维度": ["观点词", "情感倾向[正向,负向,未提及]"]}],
+    'model_type': 'uie-senta-base',
     # 训练数据集
     'train_file': 'datasets/train.txt',
     # 验证数据集

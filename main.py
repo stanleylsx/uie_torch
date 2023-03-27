@@ -67,3 +67,9 @@ if __name__ == '__main__':
             logger.logger.info('putput:{}, cost {}(ms).'.format(str(result), time_cost))
             pprint(result)
             print('time consumption: %.3f(ms)' % time_cost)
+    elif mode == 'export_torch':
+        from engines.utils.convert import extract_and_convert
+        model_type = configure['model_type']
+        model_path = os.path.join(model_type, 'torch')
+        extract_and_convert(model_type, model_path)
+        print('covert pytorch successful!')

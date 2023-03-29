@@ -73,3 +73,7 @@ if __name__ == '__main__':
         model_path = os.path.join(model_type, 'torch')
         extract_and_convert(model_type, model_path)
         print('covert pytorch successful!')
+    elif mode == 'export_onnx':
+        from engines.predict import Predict
+        predict = Predict(device, logger)
+        predict.export_onnx()

@@ -4,7 +4,7 @@ from torch.utils.data import DataLoader
 from engines.utils.text_utils import dbc2sbc, cut_chinese_sent
 from engines.utils.span_evaluator import get_bool_ids_greater_than, get_span
 from engines.data import unify_prompt_name, get_relation_type_dict, IEMapDataset, get_id_and_prob
-from config import configure
+from config import configure, mode
 from itertools import chain
 import numpy as np
 import torch
@@ -51,7 +51,7 @@ class Predict:
         self.is_en = True if schema_lang == 'en' else False
         self._schema_tree = None
 
-        if self.engine == 'pytorch':
+        if mode == 'export_onnx' or self.engine == 'pytorch':
             from engines.models.uie import UIE, UIEM
             logger.logger.info('>>> [PyTorchInferBackend] Creating Engine ...')
             if self.multilingual:
@@ -72,10 +72,8 @@ class Predict:
                     self.model = UIEM.from_pretrained(self.model_path)
                 else:
                     self.model = UIE.from_pretrained(self.model_path)
-                input_names = ['input_ids', 'token_type_ids', 'attention_mask']
-                output_names = ['start_prob', 'end_prob']
                 logger.info('Converting to the inference model cost a little time.')
-                save_path = self.export_onnx(input_names, output_names)
+                save_path = self.export_onnx()
                 logger.info('The inference model save in the path:{}'.format(save_path))
                 del self.model
             from onnxruntime import InferenceSession, SessionOptions
@@ -516,7 +514,9 @@ class Predict:
                 raise TypeError('Invalid schema, element should be string or dict, but {} received'.format(type(s)))
         return schema_tree
 
-    def export_onnx(self, input_names, output_names):
+    def export_onnx(self):
+        input_names = ['input_ids', 'token_type_ids', 'attention_mask']
+        output_names = ['start_prob', 'end_prob']
         with torch.no_grad():
             model = self.model.to('cpu')
             model.eval()
@@ -533,6 +533,7 @@ class Predict:
                               dynamic_axes=dynamic_axes, do_constant_folding=True, opset_version=11)
         if not os.path.exists(save_path):
             self.logger.error(f'Export Failed!')
+        self.logger.info(f'Covert onnx successful!')
         return save_path
 
 

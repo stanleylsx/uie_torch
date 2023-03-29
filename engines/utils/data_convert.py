@@ -40,22 +40,22 @@ class DataConverter(object):
                     items['entities'].append(
                         {
                             'id': a["id"],
-                            "start_offset": a["value"]["start"],
-                            "end_offset": a["value"]["end"],
-                            "label": a["value"]["labels"][0],
+                            'start_offset': a['value']['start'],
+                            'end_offset': a['value']['end'],
+                            'label': a['value']['labels'][0],
                         }
                     )
                 else:
-                    items["relations"].append(
+                    items['relations'].append(
                         {
-                            "id": a["from_id"] + "-" + a["to_id"],
-                            "from_id": a["from_id"],
-                            "to_id": a["to_id"],
-                            "type": a["labels"][0],
+                            'id': a['from_id'] + '-' + a['to_id'],
+                            'from_id': a['from_id'],
+                            'to_id': a['to_id'],
+                            'type': a['labels'][0],
                         }
                     )
-        elif task_type == "cls":
-            items["label"] = line["annotations"][0]["result"][0]["value"]["choices"]
+        elif task_type == 'cls':
+            items['label'] = line['annotations'][0]['result'][0]['value']['choices']
         return items
 
     def convert_cls_examples(self, raw_examples):
@@ -63,11 +63,11 @@ class DataConverter(object):
         Convert labeled data for classification task.
         """
         examples = []
-        self.logger.info("Converting annotation data...")
+        self.logger.info('Converting annotation data...')
         with tqdm(total=len(raw_examples)):
             for line in raw_examples:
-                items = self.process_text_tag(line, task_type="cls")
-                text, labels = items["text"], items["label"]
+                items = self.process_text_tag(line, task_type='cls')
+                text, labels = items['text'], items['label']
                 example = self.generate_cls_example(text, labels, self.prompt_prefix)
                 examples.append(example)
         return examples
@@ -110,11 +110,11 @@ class DataConverter(object):
         # List of predicate for each example
         predicate_list = []
 
-        self.logger.info("Converting annotation data...")
+        self.logger.info('Converting annotation data...')
         with tqdm(total=len(raw_examples)) as pbar:
             for line in raw_examples:
-                items = self.process_text_tag(line, task_type="ext")
-                text, relations, entities = items["text"], items["relations"], items["entities"]
+                items = self.process_text_tag(line, task_type='ext')
+                text, relations, entities = items['text'], items['relations'], items['entities']
                 texts.append(text)
 
                 entity_example = []
@@ -122,39 +122,39 @@ class DataConverter(object):
                 entity_example_map = {}
                 entity_map = {}  # id to entity name
                 for entity in entities:
-                    entity_name = text[entity["start_offset"] : entity["end_offset"]]
-                    entity_map[entity["id"]] = {
-                        "name": entity_name,
-                        "start": entity["start_offset"],
-                        "end": entity["end_offset"],
+                    entity_name = text[entity['start_offset']: entity['end_offset']]
+                    entity_map[entity['id']] = {
+                        'name': entity_name,
+                        'start': entity['start_offset'],
+                        'end': entity['end_offset'],
                     }
-                    if entity["label"] in self.ignore_list:
+                    if entity['label'] in self.ignore_list:
                         continue
 
-                    entity_label, entity_cls_label = _sep_cls_label(entity["label"], self.separator)
+                    entity_label, entity_cls_label = _sep_cls_label(entity['label'], self.separator)
 
                     # Define the prompt prefix for entity-level classification
                     # xxx + "的" + 情感倾向 -> Chinese
                     # Sentiment classification + " of " + xxx -> English
-                    if self.schema_lang == "ch":
-                        entity_cls_prompt_prefix = entity_name + "的" + self.prompt_prefix
+                    if self.schema_lang == 'ch':
+                        entity_cls_prompt_prefix = entity_name + '的' + self.prompt_prefix
                     else:
-                        entity_cls_prompt_prefix = self.prompt_prefix + " of " + entity_name
+                        entity_cls_prompt_prefix = self.prompt_prefix + ' of ' + entity_name
                     if entity_cls_label is not None:
                         entity_cls_example = self.generate_cls_example(text, entity_cls_label, entity_cls_prompt_prefix)
                         entity_cls_examples.append(entity_cls_example)
 
-                    result = {"text": entity_name, "start": entity["start_offset"], "end": entity["end_offset"]}
+                    result = {'text': entity_name, 'start': entity['start_offset'], 'end': entity['end_offset']}
                     if entity_label not in entity_example_map.keys():
                         entity_example_map[entity_label] = {
-                            "content": text,
-                            "result_list": [result],
-                            "prompt": entity_label,
+                            'content': text,
+                            'result_list': [result],
+                            'prompt': entity_label,
                         }
                     else:
-                        entity_example_map[entity_label]["result_list"].append(result)
+                        entity_example_map[entity_label]['result_list'].append(result)
 
-                    if entity_label not in entity_label_set and entity_label != "观点词":
+                    if entity_label not in entity_label_set and entity_label != '观点词':
                         entity_label_set.append(entity_label)
                     if entity_name not in entity_name_set:
                         entity_name_set.append(entity_name)
@@ -173,34 +173,34 @@ class DataConverter(object):
                 inverse_relation = []
                 predicates = []
                 for relation in relations:
-                    predicate = relation["type"]
-                    subject_id = relation["from_id"]
-                    object_id = relation["to_id"]
+                    predicate = relation['type']
+                    subject_id = relation['from_id']
+                    object_id = relation['to_id']
                     # The relation prompt is constructed as follows:
                     # subject + "的" + predicate -> Chinese
                     # predicate + " of " + subject -> English
-                    if self.schema_lang == "ch":
-                        prompt = entity_map[subject_id]["name"] + "的" + predicate
-                        inverse_negative = entity_map[object_id]["name"] + "的" + predicate
+                    if self.schema_lang == 'ch':
+                        prompt = entity_map[subject_id]['name'] + '的' + predicate
+                        inverse_negative = entity_map[object_id]['name'] + '的' + predicate
                     else:
-                        prompt = predicate + " of " + entity_map[subject_id]["name"]
-                        inverse_negative = predicate + " of " + entity_map[object_id]["name"]
+                        prompt = predicate + ' of ' + entity_map[subject_id]['name']
+                        inverse_negative = predicate + ' of ' + entity_map[object_id]['name']
 
-                    if entity_map[subject_id]["name"] not in subject_golden:
-                        subject_golden.append(entity_map[subject_id]["name"])
+                    if entity_map[subject_id]['name'] not in subject_golden:
+                        subject_golden.append(entity_map[subject_id]['name'])
                     result = {
-                        "text": entity_map[object_id]["name"],
-                        "start": entity_map[object_id]["start"],
-                        "end": entity_map[object_id]["end"],
+                        'text': entity_map[object_id]['name'],
+                        'start': entity_map[object_id]['start'],
+                        'end': entity_map[object_id]['end'],
                     }
 
                     inverse_relation.append(inverse_negative)
                     predicates.append(predicate)
 
                     if prompt not in relation_example_map.keys():
-                        relation_example_map[prompt] = {"content": text, "result_list": [result], "prompt": prompt}
+                        relation_example_map[prompt] = {'content': text, 'result_list': [result], 'prompt': prompt}
                     else:
-                        relation_example_map[prompt]["result_list"].append(result)
+                        relation_example_map[prompt]['result_list'].append(result)
 
                     if predicate not in predicate_set:
                         predicate_set.append(predicate)
@@ -216,7 +216,7 @@ class DataConverter(object):
                 predicate_list.append(predicates)
                 pbar.update(1)
 
-        self.logger.info("Adding negative samples for first stage prompt...")
+        self.logger.info('Adding negative samples for first stage prompt...')
         positive_examples, negative_examples = self.add_entity_negative_example(
             entity_examples, texts, entity_prompt_list, entity_label_set)
         if len(positive_examples) == 0:
@@ -226,7 +226,7 @@ class DataConverter(object):
 
         all_relation_examples = []
         if len(predicate_set) != 0:
-            self.logger.info("Adding negative samples for second stage prompt...")
+            self.logger.info('Adding negative samples for second stage prompt...')
             if is_train:
 
                 positive_examples = []
@@ -248,9 +248,9 @@ class DataConverter(object):
                             nonentity_list = list(set(entity_name_set) ^ set(subject_golden_list[i]))
                             nonentity_list.sort()
 
-                            if self.schema_lang == "ch":
+                            if self.schema_lang == 'ch':
                                 redundants2 = [
-                                    nonentity + "的" + predicate_list[i][random.randrange(len(predicate_list[i]))]
+                                    nonentity + '的' + predicate_list[i][random.randrange(len(predicate_list[i]))]
                                     for nonentity in nonentity_list
                                 ]
                             else:
@@ -265,17 +265,17 @@ class DataConverter(object):
                             non_ent_label_list = list(set(entity_label_set) ^ set(entity_prompt_list[i]))
                             non_ent_label_list.sort()
 
-                            if self.schema_lang == "ch":
+                            if self.schema_lang == 'ch':
                                 redundants3 = [
                                     subject_golden_list[i][random.randrange(len(subject_golden_list[i]))]
-                                    + "的"
+                                    + '的'
                                     + non_ent_label
                                     for non_ent_label in non_ent_label_list
                                 ]
                             else:
                                 redundants3 = [
                                     non_ent_label
-                                    + " of "
+                                    + ' of '
                                     + subject_golden_list[i][random.randrange(len(subject_golden_list[i]))]
                                     for non_ent_label in non_ent_label_list
                                 ]
@@ -314,16 +314,16 @@ class DataConverter(object):
 
     def generate_cls_example(self, text, labels, prompt_prefix):
         random.shuffle(self.options)
-        cls_options = ",".join(self.options)
-        prompt = prompt_prefix + "[" + cls_options + "]"
+        cls_options = ','.join(self.options)
+        prompt = prompt_prefix + '[' + cls_options + ']'
 
         result_list = []
-        example = {"content": text, "result_list": result_list, "prompt": prompt}
+        example = {'content': text, 'result_list': result_list, 'prompt': prompt}
         for label in labels:
             start = prompt.rfind(label) - len(prompt) - 1
             end = start + len(label)
-            result = {"text": label, "start": start, "end": end}
-            example["result_list"].append(result)
+            result = {'text': label, 'start': start, 'end': end}
+            example['result_list'].append(result)
         return example
 
     def add_full_negative_example(self, examples, texts, relation_prompt_list, predicate_set, subject_golden_list):
@@ -335,12 +335,12 @@ class DataConverter(object):
                         # The relation prompt is constructed as follows:
                         # subject + "的" + predicate -> Chinese
                         # predicate + " of " + subject -> English
-                        if self.schema_lang == "ch":
-                            prompt = subject + "的" + predicate
+                        if self.schema_lang == 'ch':
+                            prompt = subject + '的' + predicate
                         else:
-                            prompt = predicate + " of " + subject
+                            prompt = predicate + ' of ' + subject
                         if prompt not in relation_prompt:
-                            negative_result = {"content": texts[i], "result_list": [], "prompt": prompt}
+                            negative_result = {'content': texts[i], 'result_list': [], 'prompt': prompt}
                             negative_sample.append(negative_result)
                 examples[i].extend(negative_sample)
                 pbar.update(1)
@@ -367,7 +367,7 @@ class DataConverter(object):
                     idxs = random.sample(range(0, len(redundants)), self.negative_ratio * num_positive)
 
                 for idx in idxs:
-                    negative_result = {"content": texts[i], "result_list": [], "prompt": redundants[idx]}
+                    negative_result = {'content': texts[i], 'result_list': [], 'prompt': redundants[idx]}
                     negative_examples.append(negative_result)
                 positive_examples.extend(examples[i])
                 pbar.update(1)
@@ -392,11 +392,11 @@ class DataConverter(object):
             rest_idxs = list(set(all_idxs) ^ set(idxs))
 
         for idx in idxs:
-            negative_result = {"content": text, "result_list": [], "prompt": redundants[idx]}
+            negative_result = {'content': text, 'result_list': [], 'prompt': redundants[idx]}
             added_example.append(negative_result)
 
         for rest_idx in rest_idxs:
-            negative_result = {"content": text, "result_list": [], "prompt": redundants[rest_idx]}
+            negative_result = {'content': text, 'result_list': [], 'prompt': redundants[rest_idx]}
             rest_example.append(negative_result)
 
         return added_example, rest_example

@@ -182,15 +182,8 @@ class Predict:
 
     def set_schema(self):
         if isinstance(self.schema, dict) or isinstance(self.schema, str):
-            schema = [self.schema]
+            self.schema = [self.schema]
         self._schema_tree = self._build_tree(self.schema)
-
-    def __call__(self, inputs):
-        texts = inputs
-        if isinstance(texts, str):
-            texts = [texts]
-        results = self._multi_stage_predict(texts)
-        return results
 
     def _multi_stage_predict(self, data):
         """

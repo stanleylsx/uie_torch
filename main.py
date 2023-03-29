@@ -77,3 +77,6 @@ if __name__ == '__main__':
         from engines.predict import Predict
         predict = Predict(device, logger)
         predict.export_onnx()
+    elif mode == 'convert_label_studio':
+        from engines.utils.data_convert import DataConverter
+        DataConverter(logger=logger).do_convert()

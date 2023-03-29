@@ -11,7 +11,8 @@
 # test:                 跑测试集
 # export_torch:         转torch
 # export_onnx:          转onnx
-mode = 'interactive_predict'
+# convert_label_studio: 把label studio的数据转成数据集
+mode = 'export_onnx'
 
 # 使用GPU设备
 use_cuda = True
@@ -21,16 +22,16 @@ show_bar = True
 
 configure = {
     # prompt schema
-    'schema': ['情感倾向[正向，负向]'],
-    'model_type': 'uie-senta-medium',
+    'schema': ['姓名', '地址', '小区', '单元房号', '手机号'],
+    'model_type': 'uie-base',
     # 训练数据集
-    'train_file': 'datasets/train.txt',
+    'train_file': 'datasets/new/train.txt',
     # 验证数据集
-    'val_file': 'datasets/dev.txt',
+    'val_file': 'datasets/new/dev.txt',
     # 测试数据集
-    'test_file': 'datasets/dev.txt',
+    'test_file': 'datasets/new/dev.txt',
     # 引擎onnx或者pytorch
-    'engine': 'pytorch',
+    'engine': 'onnx',
     # 模型语言
     'schema_lang': 'zh',
     # 是否多语言

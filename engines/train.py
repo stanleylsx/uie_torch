@@ -141,7 +141,6 @@ class Train:
                         os.makedirs(save_dir)
                     model_to_save = model
                     model_to_save.save_pretrained(save_dir)
-                    self.tokenizer.save_pretrained(save_dir)
                     if self.max_model_num:
                         model_to_delete = global_step - self.max_model_num * self.valid_steps
                         model_to_delete_path = os.path.join(self.checkpoints_dir, 'model_%d' % model_to_delete)
@@ -168,7 +167,6 @@ class Train:
                         save_dir = os.path.join(self.checkpoints_dir, 'model_best')
                         model_to_save = model
                         model_to_save.save_pretrained(save_dir)
-                        self.tokenizer.save_pretrained(save_dir)
                     tic_train = time.time()
 
             if configure['is_early_stop']:
@@ -191,7 +189,6 @@ class Train:
                             self.logger.info('Early stopping')
                     else:
                         self.logger.info('Early stopping')
-                    self.tokenizer.save_pretrained(self.early_stopping_save_dir)
                     sys.exit(0)
 
     @torch.no_grad()

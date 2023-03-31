@@ -37,12 +37,13 @@ class Predict:
         assert self.engine in ['pytorch', 'onnx'], 'engine must be pytorch or onnx!'
         self.multilingual = configure['multilingual']
 
+        token_path = os.path.join(model_type, 'torch')
         if self.multilingual:
             from engines.utils.tokenizer import ErnieMTokenizerFast
-            self.tokenizer = ErnieMTokenizerFast.from_pretrained(self.model_path)
+            self.tokenizer = ErnieMTokenizerFast.from_pretrained(token_path)
         else:
             from transformers import BertTokenizerFast
-            self.tokenizer = BertTokenizerFast.from_pretrained(self.model_path)
+            self.tokenizer = BertTokenizerFast.from_pretrained(token_path)
 
         self.split_sentence = configure['split_sentence']
         use_fp16 = configure['use_fp16']
@@ -51,7 +52,10 @@ class Predict:
         self.is_en = True if schema_lang == 'en' else False
         self._schema_tree = None
 
-        if mode == 'export_onnx' or self.engine == 'pytorch':
+        if mode == 'export_onnx' and self.engine != 'pytorch':
+            raise Exception('please make sure pytorch model on your files when you export onnx!')
+
+        if self.engine == 'pytorch':
             from engines.models.uie import UIE, UIEM
             logger.logger.info('>>> [PyTorchInferBackend] Creating Engine ...')
             if self.multilingual:

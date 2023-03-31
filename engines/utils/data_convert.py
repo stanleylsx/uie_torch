@@ -6,6 +6,7 @@ import json
 import numpy as np
 from tqdm import tqdm
 from decimal import Decimal
+from config import configure
 
 
 class DataConverter(object):
@@ -16,20 +17,20 @@ class DataConverter(object):
     def __init__(self, logger):
         """Init Data Converter"""
         self.logger = logger
-        self.negative_ratio = 5
+        self.negative_ratio = configure['negative_ratio']
         self.prompt_prefix = '情感倾向'
         self.options = ['正向', '负向']
         self.separator = '##'
         self.schema_lang = 'ch'
         self.ignore_list = ['属性值', 'object']
-        self.label_studio_file = 'datasets/new/project.json'
-        self.negative_ratio = 5
-        self.save_dir = 'datasets/new/'
-        self.splits = [0.8, 0.1, 0.1]
-        self.task_type = 'ext'
+        self.label_studio_file = configure['label_studio_file']
+        self.save_dir = os.path.dirname(configure['train_file'])
+        self.splits = configure['data_splits']
+        self.task_type = configure['task_type']
         self.is_shuffle = True
 
-    def process_text_tag(self, line, task_type='ext'):
+    @staticmethod
+    def process_text_tag(line, task_type='ext'):
         items = {'text': line['data']['text']}
         if task_type == 'ext':
             items['entities'] = []

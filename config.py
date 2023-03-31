@@ -12,7 +12,7 @@
 # export_torch:         转torch
 # export_onnx:          转onnx
 # convert_label_studio: 把label studio的数据转成数据集
-mode = 'interactive_predict'
+mode = 'convert_label_studio'
 
 # 使用GPU设备
 use_cuda = True
@@ -25,11 +25,11 @@ configure = {
     'schema': ['姓名', '地址', '小区', '单元房号', '手机号'],
     'model_type': 'uie-base',
     # 训练数据集
-    'train_file': 'datasets/new/train.txt',
+    'train_file': 'datasets/train.txt',
     # 验证数据集
-    'val_file': 'datasets/new/dev.txt',
+    'val_file': 'datasets/dev.txt',
     # 测试数据集
-    'test_file': 'datasets/new/dev.txt',
+    'test_file': 'datasets/dev.txt',
     # 引擎onnx或者pytorch
     'engine': 'onnx',
     # 模型语言
@@ -65,4 +65,8 @@ configure = {
     'patience': 2,
     # Max number of saved model. Best model and early-stopping model is not included.
     'max_model_num': 1,
+    'label_studio_file': 'datasets/project.json',
+    'data_splits': [0.8, 0.1, 0.1],
+    'task_type': 'ext',
+    'negative_ratio': 5
 }

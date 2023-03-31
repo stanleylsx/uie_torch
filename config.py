@@ -12,7 +12,7 @@
 # export_torch:         转torch
 # export_onnx:          转onnx
 # convert_label_studio: 把label studio的数据转成数据集
-mode = 'export_onnx'
+mode = 'interactive_predict'
 
 # 使用GPU设备
 use_cuda = True

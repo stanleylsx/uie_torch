@@ -16,13 +16,13 @@ mode = 'interactive_predict'
 
 # 使用GPU设备
 use_cuda = True
-cuda_device = -1
+cuda_device = 1
 
 show_bar = True
 
 configure = {
     # prompt schema
-    'schema': ['姓名', '地址', '小区', '单元房号', '手机号'],
+    'schema': ['出发地', '目的地', '费用', '时间'],
     'model_type': 'uie-base',
     # 训练数据集
     'train_file': 'datasets/train.txt',

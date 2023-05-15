@@ -16,7 +16,7 @@ mode = 'interactive_predict'
 
 # 使用GPU设备
 use_cuda = True
-cuda_device = 1
+cuda_device = 0
 
 show_bar = True
 
@@ -31,7 +31,7 @@ configure = {
     # 测试数据集
     'test_file': 'datasets/dev.txt',
     # 引擎onnx或者pytorch
-    'engine': 'pytorch',
+    'engine': 'onnx',
     # 模型语言
     'schema_lang': 'zh',
     # 是否多语言

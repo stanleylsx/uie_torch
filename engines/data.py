@@ -13,7 +13,7 @@ def reader(data_path, max_seq_len=512):
             json_line = json.loads(line)
             content = json_line['content']
             prompt = json_line['prompt']
-            # Model Input is aslike: [CLS] Prompt [SEP] Content [SEP]
+            # Model Input is as like: [CLS] Prompt [SEP] Content [SEP]
             # It include three summary tokens.
             if max_seq_len <= len(prompt) + 3:
                 raise ValueError('The value of max_seq_len is too small, please set a larger value')

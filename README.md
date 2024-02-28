@@ -1,8 +1,8 @@
 # UIE PyTorch
-![Authour](https://img.shields.io/badge/Author-stanleylsx-red.svg)  
-[![License Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)  
-![python_version](https://img.shields.io/badge/Python-3.10%2B-green.svg)  
-[![torch_version](https://img.shields.io/badge/torch-2.0%2B-pink.svg)](requirements.txt)  
+![Authour](https://img.shields.io/badge/Author-stanleylsx-red.svg)
+[![License Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+![python_version](https://img.shields.io/badge/Python-3.10%2B-green.svg)
+[![torch_version](https://img.shields.io/badge/torch-2.0%2B-pink.svg)](requirements.txt)
 
 ## Introduction
 基于UIE(Universal Information Extraction)方法的通用信息抽取工具训练预测项目，项目支持UIE模型的自动下载和torch及onnx模型的转换。支持UIE通用抽取模型和情感抽取模型，该项目支持加载torch和onnx模型文件进行预测，不支持paddle模型直接预测。

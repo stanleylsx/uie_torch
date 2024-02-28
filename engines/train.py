@@ -62,8 +62,8 @@ class Train:
                         self.logger.info(*args, **kwargs)
             else:
                 trace_func = self.logger.info
-            self.early_stopping = EarlyStopping(patience=configure['patience'], verbose=True, trace_func=trace_func,
-                                           save_dir=self.early_stopping_save_dir)
+            self.early_stopping = EarlyStopping(patience=configure['patience'], verbose=True, 
+                                                trace_func=trace_func, save_dir=self.early_stopping_save_dir)
 
     def train(self):
         if self.multilingual:
@@ -131,8 +131,8 @@ class Train:
                                 'global step %d, epoch: %d, loss: %.5f, speed: %.2f step/s' % (
                                     global_step, epoch, loss_avg, self.logging_steps / time_diff))
                     else:
-                        self.logger.info('global step %d, epoch: %d, loss: %.5f, speed: %.2f step/s'
-                                    % (global_step, epoch, loss_avg, self.logging_steps / time_diff))
+                        self.logger.info('global step %d, epoch: %d, loss: %.5f, speed: %.2f step/s' % (
+                            global_step, epoch, loss_avg, self.logging_steps / time_diff))
                     tic_train = time.time()
 
                 if global_step % self.valid_steps == 0:
@@ -151,11 +151,11 @@ class Train:
                         train_postfix_info.update({'F1': f'{f1:.3f}', 'dev loss': f'{dev_loss_avg:.5f}'})
                         train_data_iterator.set_postfix(train_postfix_info)
                         with logging_redirect_tqdm([self.logger.logger]):
-                            self.logger.info('Evaluation precision: %.5f, recall: %.5f, F1: %.5f, dev loss: %.5f'
-                                        % (precision, recall, f1, dev_loss_avg))
+                            self.logger.info('Evaluation precision: %.5f, recall: %.5f, F1: %.5f, dev loss: %.5f' % (
+                                precision, recall, f1, dev_loss_avg))
                     else:
-                        self.logger.info('Evaluation precision: %.5f, recall: %.5f, F1: %.5f, dev loss: %.5f'
-                                    % (precision, recall, f1, dev_loss_avg))
+                        self.logger.info('Evaluation precision: %.5f, recall: %.5f, F1: %.5f, dev loss: %.5f' % (
+                            precision, recall, f1, dev_loss_avg))
                     # Save model which has best F1
                     if f1 > best_f1:
                         if show_bar:
@@ -175,11 +175,11 @@ class Train:
                     train_postfix_info.update({'F1': f'{f1:.3f}', 'dev loss': f'{dev_loss_avg:.5f}'})
                     train_data_iterator.set_postfix(train_postfix_info)
                     with logging_redirect_tqdm([self.logger.logger]):
-                        self.logger.info('Evaluation precision: %.5f, recall: %.5f, F1: %.5f, dev loss: %.5f'
-                                    % (precision, recall, f1, dev_loss_avg))
+                        self.logger.info('Evaluation precision: %.5f, recall: %.5f, F1: %.5f, dev loss: %.5f' % (
+                            precision, recall, f1, dev_loss_avg))
                 else:
-                    self.logger.info('Evaluation precision: %.5f, recall: %.5f, F1: %.5f, dev loss: %.5f'
-                                % (precision, recall, f1, dev_loss_avg))
+                    self.logger.info('Evaluation precision: %.5f, recall: %.5f, F1: %.5f, dev loss: %.5f' % (
+                        precision, recall, f1, dev_loss_avg))
 
                 # Early Stopping
                 self.early_stopping(dev_loss_avg, model)

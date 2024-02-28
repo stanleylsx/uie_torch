@@ -268,9 +268,7 @@ class DataConverter(object):
 
                             if self.schema_lang == 'ch':
                                 redundants3 = [
-                                    subject_golden_list[i][random.randrange(len(subject_golden_list[i]))]
-                                    + '的'
-                                    + non_ent_label
+                                    subject_golden_list[i][random.randrange(len(subject_golden_list[i]))] + '的' + non_ent_label
                                     for non_ent_label in non_ent_label_list
                                 ]
                             else:

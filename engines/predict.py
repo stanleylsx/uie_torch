@@ -108,7 +108,7 @@ class Predict:
                     assert 'CUDAExecutionProvider' in self.predictor.get_providers()
                 except AssertionError:
                     raise AssertionError(
-                        f'The environment for GPU inference is not set properly. '
+                        'The environment for GPU inference is not set properly. '
                         'A possible cause is that you had installed both onnxruntime and onnxruntime-gpu. '
                         'Please run the following commands to reinstall: \n '
                         '1) pip uninstall -y onnxruntime onnxruntime-gpu \n 2) pip install onnxruntime-gpu'
@@ -529,8 +529,8 @@ class Predict:
             torch.onnx.export(model, (inputs,), save_path, input_names=input_names, output_names=output_names,
                               dynamic_axes=dynamic_axes, do_constant_folding=True, opset_version=11)
         if not os.path.exists(save_path):
-            self.logger.error(f'Export Failed!')
-        self.logger.info(f'Covert onnx successful!')
+            self.logger.error('Export Failed!')
+        self.logger.info('Covert onnx successful!')
         return save_path
 
 

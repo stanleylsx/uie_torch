@@ -31,7 +31,7 @@ configure = {
     # 测试数据集
     'test_file': 'datasets/dev.txt',
     # 引擎onnx或者pytorch
-    'engine': 'onnx',
+    'engine': 'pytorch',
     # 模型语言
     'schema_lang': 'zh',
     # 是否多语言

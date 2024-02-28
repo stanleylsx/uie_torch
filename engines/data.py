@@ -120,7 +120,7 @@ def convert_example(example, tokenizer, max_seq_len):
         start_ids, end_ids
     ]
     tokenized_output = [np.array(x, dtype='int64') for x in tokenized_output]
-    tokenized_output = [np.pad(x, (0, max_seq_len-x.shape[-1]), 'constant') for x in tokenized_output]
+    tokenized_output = [np.pad(x, (0, max_seq_len - x.shape[-1]), 'constant') for x in tokenized_output]
     return tuple(tokenized_output)
 
 
@@ -248,4 +248,3 @@ def get_id_and_prob(spans, offset_map):
         prob.append(start[1] * end[1])
         sentence_id.append((offset_map[start[0]][0], offset_map[end[0]][1]))
     return sentence_id, prob
-

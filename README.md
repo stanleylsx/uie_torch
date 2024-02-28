@@ -1,7 +1,7 @@
 # UIE PyTorch
-![Authour](https://img.shields.io/badge/Author-stanleylsx-red.svg) 
+![Authour](https://img.shields.io/badge/Author-stanleylsx-red.svg)  
 [![License Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)  
-![python_version](https://img.shields.io/badge/Python-3.10%2B-green.svg)
+![python_version](https://img.shields.io/badge/Python-3.10%2B-green.svg)  
 [![torch_version](https://img.shields.io/badge/torch-2.0%2B-pink.svg)](requirements.txt)  
 
 ## Introduction

@@ -51,7 +51,7 @@ train              | 训练UIE                   |
 interactive_predict| 交互预测模式               |
 test               | 跑测试集                   |
 export_torch       | 将paddle模型保存torch模型  |
-export_onnx        | 将torch模型保存未onnx模型  |
+export_onnx        | 将torch模型保存为onnx模型  |
 
 ## Getting start
 项目只需要在config.py中配置好所有策略，然后点击main.py即可运行，没有其他的入口。

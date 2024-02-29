@@ -334,11 +334,9 @@ class ErnieMTokenizer(PreTrainedTokenizer):
             print(f"Vocabulary path ({save_directory}) should be a directory")
             exit(1)
         sentencepiece_model_file = os.path.join(
-            save_directory, (filename_prefix + "-" if filename_prefix else "") +
-            VOCAB_FILES_NAMES["sentencepiece_model_file"]
+            save_directory, (filename_prefix + "-" if filename_prefix else "") + VOCAB_FILES_NAMES["sentencepiece_model_file"]
         )
-        vocab_file = (filename_prefix +
-                      "-" if filename_prefix else "") + save_directory
+        vocab_file = (filename_prefix + "-" if filename_prefix else "") + save_directory
 
         if os.path.abspath(self.vocab_file) != os.path.abspath(sentencepiece_model_file) and os.path.isfile(self.vocab_file):
             copyfile(self.vocab_file, sentencepiece_model_file)
@@ -361,7 +359,7 @@ class ErnieMTokenizer(PreTrainedTokenizer):
         return vocab_file, sentencepiece_model_file
 
     @staticmethod
-    def is_ch_char( char):
+    def is_ch_char(char):
         """
         is_ch_char
         """
@@ -482,9 +480,9 @@ class ErnieMTokenizerFast(PreTrainedTokenizerFast):
         normalizer_state = json.loads(
             self.backend_tokenizer.normalizer.__getstate__())
         if (
-            normalizer_state.get("lowercase", do_lower_case) != do_lower_case
-            or normalizer_state.get("strip_accents", strip_accents) != strip_accents
-            or normalizer_state.get("handle_chinese_chars", tokenize_chinese_chars) != tokenize_chinese_chars
+            normalizer_state.get("lowercase", do_lower_case) != do_lower_case or normalizer_state.get(
+                "strip_accents", strip_accents) != strip_accents or normalizer_state.get(
+                    "handle_chinese_chars", tokenize_chinese_chars) != tokenize_chinese_chars
         ):
             normalizer_class = getattr(
                 normalizers, normalizer_state.pop("type"))

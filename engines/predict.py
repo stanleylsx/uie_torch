@@ -63,17 +63,17 @@ class Predict:
 
         if self.engine == 'pytorch':
             from engines.models.uie import UIE, UIEM
-            logger.logger.info('>>> [PyTorchInferBackend] Creating Engine ...')
+            logger.info('>>> [PyTorchInferBackend] Creating Engine ...')
             if self.multilingual:
                 self.model = UIEM.from_pretrained(self.model_path)
             else:
                 self.model = UIE.from_pretrained(self.model_path)
             self.model.eval()
             if use_fp16:
-                logger.logger.info('>>> [PyTorchInferBackend] Use FP16 to inference ...')
+                logger.info('>>> [PyTorchInferBackend] Use FP16 to inference ...')
                 self.model = self.model.half()
             self.model = self.model.to(device)
-            logger.logger.info('>>> [PyTorchInferBackend] Engine Created ...')
+            logger.info('>>> [PyTorchInferBackend] Engine Created ...')
         if self.engine == 'onnx':
             if os.path.exists(os.path.join(self.model_path, 'pytorch_model.bin')) \
                     and not os.path.exists(os.path.join(self.model_path, 'inference.onnx')):
@@ -87,15 +87,15 @@ class Predict:
                 logger.info('The inference model save in the path:{}'.format(save_path))
                 del self.model
             from onnxruntime import InferenceSession, SessionOptions
-            logger.logger.info('>>> [ONNXInferBackend] Creating Engine ...')
+            logger.info('>>> [ONNXInferBackend] Creating Engine ...')
             onnx_model = float_onnx_file = os.path.join(self.model_path, 'inference.onnx')
             if not os.path.exists(onnx_model):
                 raise OSError(f'{onnx_model} not exists!')
             if str(device) == 'cuda':
                 providers = ['CUDAExecutionProvider']
-                logger.logger.info('>>> [ONNXInferBackend] Use GPU to inference ...')
+                logger.info('>>> [ONNXInferBackend] Use GPU to inference ...')
                 if use_fp16:
-                    logger.logger.info('>>> [ONNXInferBackend] Use FP16 to inference ...')
+                    logger.info('>>> [ONNXInferBackend] Use FP16 to inference ...')
                     from onnxconverter_common import float16
                     import onnx
                     fp16_model_file = os.path.join(self.model_path, 'fp16_model.onnx')
@@ -105,7 +105,7 @@ class Predict:
                     onnx_model = fp16_model_file
             else:
                 providers = ['CPUExecutionProvider']
-                logger.logger.info('>>> [ONNXInferBackend] Use CPU to inference ...')
+                logger.info('>>> [ONNXInferBackend] Use CPU to inference ...')
 
             sess_options = SessionOptions()
             self.predictor = InferenceSession(onnx_model, sess_options=sess_options, providers=providers)
@@ -119,7 +119,7 @@ class Predict:
                         'Please run the following commands to reinstall: \n '
                         '1) pip uninstall -y onnxruntime onnxruntime-gpu \n 2) pip install onnxruntime-gpu'
                     )
-            logger.logger.info('>>> [InferBackend] Engine Created ...')
+            logger.info('>>> [InferBackend] Engine Created ...')
 
         self.debug = False
 

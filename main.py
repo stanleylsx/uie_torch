@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+# @Time : 2021/07/15 21:03 下午
+# @Author : lishouxian
+# @Email : gzlishouxian@gmail.com
+# @File : main.py
+# @Software: VScode
 from engines.utils.logger import Logger
 from engines.utils.setup_seed import set_seed
 from config import use_cuda, cuda_device, configure, mode

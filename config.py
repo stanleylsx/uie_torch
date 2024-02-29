@@ -3,7 +3,7 @@
 # @Author : lishouxian
 # @Email : gzlishouxian@gmail.com
 # @File : config.py
-# @Software: PyCharm
+# @Software: VScode
 
 # 模式
 # train:                训练UIE

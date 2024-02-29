@@ -336,8 +336,7 @@ def validate_model(tokenizer, pt_model, pd_model, model_type='uie', atol: float 
 
     batch_size = 2
     seq_length = 6
-    dummy_input = [" ".join([tokenizer.unk_token])
-                   * seq_length] * batch_size
+    dummy_input = [" ".join([tokenizer.unk_token]) * seq_length] * batch_size
     encoded_inputs = dict(tokenizer(dummy_input, pad_to_max_seq_len=True, max_seq_len=512, return_attention_mask=True,
                                     return_position_ids=True))
     paddle_inputs = {}

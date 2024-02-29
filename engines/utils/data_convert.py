@@ -273,9 +273,7 @@ class DataConverter(object):
                                 ]
                             else:
                                 redundants3 = [
-                                    non_ent_label
-                                    + ' of '
-                                    + subject_golden_list[i][random.randrange(len(subject_golden_list[i]))]
+                                    non_ent_label + ' of ' + subject_golden_list[i][random.randrange(len(subject_golden_list[i]))]
                                     for non_ent_label in non_ent_label_list
                                 ]
 

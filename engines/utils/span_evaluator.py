@@ -141,12 +141,9 @@ class SpanEvaluator:
         Returns:
             tuple: Returns tuple (`precision, recall, f1 score`).
         """
-        precision = float(self.num_correct_spans /
-                          self.num_infer_spans) if self.num_infer_spans else 0.
-        recall = float(self.num_correct_spans /
-                       self.num_label_spans) if self.num_label_spans else 0.
-        f1_score = float(2 * precision * recall /
-                         (precision + recall)) if self.num_correct_spans else 0.
+        precision = float(self.num_correct_spans / self.num_infer_spans) if self.num_infer_spans else 0.
+        recall = float(self.num_correct_spans / self.num_label_spans) if self.num_label_spans else 0.
+        f1_score = float(2 * precision * recall / (precision + recall)) if self.num_correct_spans else 0.
         return precision, recall, f1_score
 
     def reset(self):

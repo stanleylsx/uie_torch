@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+# @Time : 2021/07/15 21:03 下午
+# @Author : lishouxian
+# @Email : gzlishouxian@gmail.com
+# @File : predict.py
+# @Software: VScode
 from engines.train import Train
 from engines.data import IEDataset
 from torch.utils.data import DataLoader

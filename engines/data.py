@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+# @Time : 2021/07/15 21:03 下午
+# @Author : lishouxian
+# @Email : gzlishouxian@gmail.com
+# @File : data.py
+# @Software: VScode
 from torch.utils.data import Dataset
 import numpy as np
 import json

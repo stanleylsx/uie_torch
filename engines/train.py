@@ -62,7 +62,7 @@ class Train:
                         self.logger.info(*args, **kwargs)
             else:
                 trace_func = self.logger.info
-            self.early_stopping = EarlyStopping(patience=configure['patience'], verbose=True, 
+            self.early_stopping = EarlyStopping(patience=configure['patience'], verbose=True,
                                                 trace_func=trace_func, save_dir=self.early_stopping_save_dir)
 
     def train(self):

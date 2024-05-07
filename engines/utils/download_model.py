@@ -198,8 +198,8 @@ def get_path_from_url(url, root_dir, check_exist=True, decompress=True):
     else:
         fullpath = _download(url, root_dir)
 
-    if decompress and (tarfile.is_tarfile(fullpath) or
-                       zipfile.is_zipfile(fullpath)):
+    if decompress and (tarfile.is_tarfile(
+            fullpath) or zipfile.is_zipfile(fullpath)):
         fullpath = _decompress(fullpath)
 
     return fullpath

@@ -30,7 +30,7 @@ class Train:
         self.logger = logger
         self.device = device
         self.train_path = configure['train_file']
-        self.dev_path = configure['val_file']
+        self.val_path = configure['val_file']
         self.max_seq_len = configure['max_position_embeddings']
         self.batch_size = configure['batch_size']
         self.learning_rate = configure['learning_rate']
@@ -72,9 +72,11 @@ class Train:
             model = UIE.from_pretrained(self.model_path).to(self.device)
 
         train_ds = IEDataset(self.train_path, tokenizer=self.tokenizer, max_seq_len=self.max_seq_len)
-        dev_ds = IEDataset(self.dev_path, tokenizer=self.tokenizer, max_seq_len=self.max_seq_len)
+        self.logger.info('train_data_length:{}'.format(len(train_ds)))
+        val_ds = IEDataset(self.val_path, tokenizer=self.tokenizer, max_seq_len=self.max_seq_len)
+        self.logger.info('val_data_length:{}'.format(len(val_ds)))
         train_data_loader = DataLoader(train_ds, batch_size=self.batch_size, shuffle=True)
-        dev_data_loader = DataLoader(dev_ds, batch_size=self.batch_size, shuffle=True)
+        dev_data_loader = DataLoader(val_ds, batch_size=self.batch_size, shuffle=True)
         optimizer = torch.optim.AdamW(lr=self.learning_rate, params=model.parameters())
         loss_list = []
         loss_sum = 0

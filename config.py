@@ -25,11 +25,11 @@ configure = {
     'schema': ['出发地', '目的地', '费用', '时间'],
     'model_type': 'uie-base',
     # 训练数据集
-    'train_file': 'datasets/train.txt',
+    'train_file': 'datasets/fare/train.txt',
     # 验证数据集
-    'val_file': 'datasets/dev.txt',
+    'val_file': 'datasets/fare/dev.txt',
     # 测试数据集
-    'test_file': 'datasets/dev.txt',
+    'test_file': 'datasets/fare/dev.txt',
     # 引擎onnx或者pytorch
     'engine': 'pytorch',
     # 模型语言

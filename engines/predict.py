@@ -22,7 +22,7 @@ class Predict:
     def __init__(self, device, logger):
         self.logger = logger
         self.device = device
-        self.max_seq_len = configure['max_sequence_length']
+        self.max_seq_len = configure['max_position_embeddings']
         self.batch_size = configure['batch_size']
         self.position_prob = configure['position_prob']
         self.engine = configure['engine']

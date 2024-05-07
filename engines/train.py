@@ -31,7 +31,7 @@ class Train:
         self.device = device
         self.train_path = configure['train_file']
         self.dev_path = configure['val_file']
-        self.max_seq_len = configure['max_sequence_length']
+        self.max_seq_len = configure['max_position_embeddings']
         self.batch_size = configure['batch_size']
         self.learning_rate = configure['learning_rate']
         self.checkpoints_dir = configure['checkpoints_dir']

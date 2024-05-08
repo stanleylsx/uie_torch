@@ -51,5 +51,5 @@ class EarlyStopping:
             self.trace_func(
                 f'Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).  Saving model ...')
         model.save_pretrained(self.save_dir)
-        self.trace_func('saved model successful..')
+        self.trace_func(f'saved model to {self.save_dir} successful..')
         self.val_loss_min = val_loss

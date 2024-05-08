@@ -7,6 +7,7 @@
 from engines.train import Train
 from engines.data import IEDataset
 from torch.utils.data import DataLoader
+from engines.utils.tqdm_util import logging_redirect_tqdm
 from engines.utils.text_utils import dbc2sbc, cut_chinese_sent
 from engines.utils.span_evaluator import get_bool_ids_greater_than, get_span
 from engines.data import unify_prompt_name, get_relation_type_dict, IEMapDataset, get_id_and_prob
@@ -33,7 +34,8 @@ class Predict:
             self.model_path = os.path.join(checkpoints_dir, 'early_stopping')
         else:
             self.model_path = os.path.join(checkpoints_dir, 'best_model')
-        self.logger.info(f'load model from {self.model_path}')
+        with logging_redirect_tqdm([self.logger]):
+            self.logger.info(f'load model from {self.model_path}')
         if not os.path.exists(self.model_path):
             from engines.utils.convert import check_model, extract_and_convert
             model_path = os.path.join(model_type, 'torch')
@@ -178,18 +180,20 @@ class Predict:
 
             test_data_loader = DataLoader(test_ds, batch_size=self.batch_size, shuffle=False)
             precision, recall, f1 = self.train.evaluate(self.model, test_data_loader, return_loss=False)
-            self.logger.info('-----------------------------')
-            self.logger.info('Class Name: %s' % key)
-            self.logger.info('Evaluation Precision: %.5f | Recall: %.5f | F1: %.5f' % (precision, recall, f1))
+            with logging_redirect_tqdm([self.logger]):
+                self.logger.info('-----------------------------')
+                self.logger.info('Class Name: %s' % key)
+                self.logger.info('Evaluation Precision: %.5f | Recall: %.5f | F1: %.5f' % (precision, recall, f1))
 
         if self.debug and len(relation_type_dict.keys()) != 0:
             for key in relation_type_dict.keys():
                 test_ds = IEMapDataset(relation_type_dict[key], tokenizer=self.tokenizer, max_seq_len=self.max_seq_len)
                 test_data_loader = DataLoader(test_ds, batch_size=self.batch_size, shuffle=False)
                 precision, recall, f1 = self.train.evaluate(self.model, test_data_loader, return_loss=False)
-                self.logger.info('-----------------------------')
-                self.logger.info('Class Name: X的%s' % key)
-                self.logger.info('Evaluation Precision: %.5f | Recall: %.5f | F1: %.5f' % (precision, recall, f1))
+                with logging_redirect_tqdm([self.logger]):
+                    self.logger.info('-----------------------------')
+                    self.logger.info('Class Name: X的%s' % key)
+                    self.logger.info('Evaluation Precision: %.5f | Recall: %.5f | F1: %.5f' % (precision, recall, f1))
 
     def set_schema(self):
         if isinstance(self.schema, dict) or isinstance(self.schema, str):

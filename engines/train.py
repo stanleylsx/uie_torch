@@ -154,7 +154,7 @@ class Train:
                         else:
                             self.logger.info(f'best F1 performance has been updated: {best_f1:.5f} --> {f1:.5f}')
                         best_f1 = f1
-                        save_dir = os.path.join(self.checkpoints_dir, 'model_best')
+                        save_dir = os.path.join(self.checkpoints_dir, 'best_model')
                         model_to_save = model
                         model_to_save.save_pretrained(save_dir)
                         with logging_redirect_tqdm([self.logger]):

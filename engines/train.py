@@ -157,7 +157,8 @@ class Train:
                         save_dir = os.path.join(self.checkpoints_dir, 'model_best')
                         model_to_save = model
                         model_to_save.save_pretrained(save_dir)
-                        self.logger.info(f'saved model to {save_dir} successful...')
+                        with logging_redirect_tqdm([self.logger]):
+                            self.logger.info(f'saved model to {save_dir} successful...')
                     tic_train = time.time()
 
             if configure['is_early_stop']:

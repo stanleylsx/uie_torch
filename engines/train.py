@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import shutil
 import sys
 import time
 import os
@@ -38,7 +37,6 @@ class Train:
         self.num_epochs = configure['epoch']
         self.logging_steps = configure['print_per_batch']
         self.valid_steps = configure['valid_steps']
-        self.max_model_num = configure['max_model_num']
         self.multilingual = configure['multilingual']
         model_type = configure['model_type']
         self.model_path = os.path.join(model_type, 'torch')
@@ -138,16 +136,6 @@ class Train:
                     tic_train = time.time()
 
                 if global_step % self.valid_steps == 0:
-                    save_dir = os.path.join(self.checkpoints_dir, 'model_%d' % global_step)
-                    if not os.path.exists(save_dir):
-                        os.makedirs(save_dir)
-                    model_to_save = model
-                    model_to_save.save_pretrained(save_dir)
-                    if self.max_model_num:
-                        model_to_delete = global_step - self.max_model_num * self.valid_steps
-                        model_to_delete_path = os.path.join(self.checkpoints_dir, 'model_%d' % model_to_delete)
-                        if model_to_delete > 0 and os.path.exists(model_to_delete_path):
-                            shutil.rmtree(model_to_delete_path)
                     dev_loss_avg, precision, recall, f1 = self.evaluate(model, data_loader=dev_data_loader)
                     if show_bar:
                         train_postfix_info.update({'F1': f'{f1:.3f}', 'dev loss': f'{dev_loss_avg:.5f}'})
@@ -169,6 +157,7 @@ class Train:
                         save_dir = os.path.join(self.checkpoints_dir, 'model_best')
                         model_to_save = model
                         model_to_save.save_pretrained(save_dir)
+                        self.logger.info('saved model successful...')
                     tic_train = time.time()
 
             if configure['is_early_stop']:

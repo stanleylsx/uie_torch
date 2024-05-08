@@ -33,6 +33,7 @@ class Predict:
             self.model_path = os.path.join(checkpoints_dir, 'early_stopping')
         else:
             self.model_path = os.path.join(checkpoints_dir, 'best_model')
+        self.logger.info(f'load model from {self.model_path}')
         if not os.path.exists(self.model_path):
             from engines.utils.convert import check_model, extract_and_convert
             model_path = os.path.join(model_type, 'torch')

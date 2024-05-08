@@ -63,8 +63,6 @@ configure = {
     # 是否提前结束微调
     'is_early_stop': True,
     'patience': 2,
-    # Max number of saved model. Best model and early-stopping model is not included.
-    'max_model_num': 1,
     # 以下是label studio转换训练数据的配置
     'label_studio_file': 'datasets/project.json',
     'data_splits': [0.8, 0.1, 0.1],

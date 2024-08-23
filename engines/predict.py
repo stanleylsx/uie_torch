@@ -526,17 +526,16 @@ class Predict:
         input_names = ['input_ids', 'token_type_ids', 'attention_mask']
         output_names = ['start_prob', 'end_prob']
         with torch.no_grad():
-            model = self.model.to('cpu')
+            model = self.model.to(self.device)
             model.eval()
             model.config.return_dict = True
             model.config.use_cache = False
             save_path = self.model_path + '/inference.onnx'
             dynamic_axes = {name: {0: 'batch', 1: 'sequence'} for name in chain(input_names, output_names)}
-            # Generate dummy input
             batch_size = 2
             seq_length = 6
             dummy_input = [' '.join([self.tokenizer.unk_token]) * seq_length] * batch_size
-            inputs = dict(self.tokenizer(dummy_input, return_tensors='pt'))
+            inputs = dict(self.tokenizer(dummy_input, return_tensors='pt').to(self.device))
             torch.onnx.export(model, (inputs,), save_path, input_names=input_names, output_names=output_names,
                               dynamic_axes=dynamic_axes, do_constant_folding=True, opset_version=11)
         if not os.path.exists(save_path):

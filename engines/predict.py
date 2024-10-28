@@ -94,7 +94,7 @@ class Predict:
             onnx_model = float_onnx_file = os.path.join(self.model_path, 'inference.onnx')
             if not os.path.exists(onnx_model):
                 raise OSError(f'{onnx_model} not exists!')
-            if str(device) == 'cuda':
+            if 'cuda' in str(device):
                 providers = ['CUDAExecutionProvider']
                 logger.info('>>> [ONNXInferBackend] Use GPU to inference ...')
                 if use_fp16:
@@ -112,7 +112,7 @@ class Predict:
 
             sess_options = SessionOptions()
             self.predictor = InferenceSession(onnx_model, sess_options=sess_options, providers=providers)
-            if str(device) == 'cuda':
+            if 'cuda' in str(device):
                 try:
                     assert 'CUDAExecutionProvider' in self.predictor.get_providers()
                 except AssertionError:

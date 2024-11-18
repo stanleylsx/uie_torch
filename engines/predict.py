@@ -523,7 +523,10 @@ class Predict:
         return schema_tree
 
     def export_onnx(self):
-        input_names = ['input_ids', 'token_type_ids', 'attention_mask']
+        if self.multilingual:
+            input_names = ['input_ids', 'position_ids']
+        else:
+            input_names = ['input_ids', 'token_type_ids', 'attention_mask']
         output_names = ['start_prob', 'end_prob']
         with torch.no_grad():
             model = self.model.to(self.device)
@@ -535,7 +538,22 @@ class Predict:
             batch_size = 2
             seq_length = 6
             dummy_input = [' '.join([self.tokenizer.unk_token]) * seq_length] * batch_size
-            inputs = dict(self.tokenizer(dummy_input, return_tensors='pt').to(self.device))
+            inputs = self.tokenizer(dummy_input, return_tensors='np')
+            input_ids = inputs['input_ids']
+            attention_mask = inputs['attention_mask']
+            if self.multilingual:
+                position_ids = (np.cumsum(np.ones_like(input_ids), axis=1) - np.ones_like(input_ids)) * attention_mask
+                inputs = {
+                    'input_ids': torch.tensor(input_ids).to(self.device),
+                    'position_ids': torch.tensor(position_ids).to(self.device),
+                }
+            else:
+                token_type_ids = inputs['token_type_ids']
+                inputs = {
+                    'input_ids': torch.tensor(input_ids).to(self.device),
+                    'token_type_ids': torch.tensor(token_type_ids).to(self.device),
+                    'attention_mask': torch.tensor(attention_mask).to(self.device),
+                }
             torch.onnx.export(model, (inputs,), save_path, input_names=input_names, output_names=output_names,
                               dynamic_axes=dynamic_axes, do_constant_folding=True, opset_version=11)
         if not os.path.exists(save_path):

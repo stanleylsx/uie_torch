@@ -5,7 +5,7 @@
 [![torch_version](https://img.shields.io/badge/torch-2.0%2B-pink.svg)](requirements.txt)
 
 ## Introduction
-基于UIE(Universal Information Extraction)方法的通用信息抽取工具训练预测项目，项目支持UIE模型的自动下载和torch及onnx模型的转换。支持UIE通用抽取模型和情感抽取模型，该项目支持加载torch和onnx模型文件进行预测，不支持paddle模型直接预测。
+基于UIE(Universal Information Extraction)方法的通用信息抽取工具训练预测项目，项目支持UIE模型的自动下载和torch及onnx模型的转换。支持UIE通用抽取模型和情感抽取模型，支持多语言抽取UIE-M模型，该项目支持加载torch和onnx模型文件进行预测，不支持paddle模型直接预测。
 
 ## Updates
 日期       | 版本     |描述
@@ -30,6 +30,8 @@ uie-medium         | 6L768H                   |
 uie-mini           | 6L384H                   |
 uie-micro          | 4L384H                   |
 uie-nano           | 4L312H                   |
+uie-m-base         | 12L768H                  |
+uie-m-large        | 24L1024H                 |
 
 ### UIE-senta
 UIE情感抽取的模型不支持直接下载，需要自己下载原始的paddle格式模型然后启动该项目转换。  
@@ -80,7 +82,9 @@ configure = {
     # 引擎onnx或者pytorch
     'engine': 'pytorch',
     # 模型语言
-    'schema_lang': 'zh'
+    'schema_lang': 'zh',
+    # 是否多语言
+    'multilingual': False
 }
 ```
 点击main.py即可运行训练，训练完后请修改checkpoints_dir路径为训练模型保存的路径（如果有训练的模型，程序会优先读取训练的模型），通过下面Interactive Predict的配置方法可以对训练的模型进行预测检验效果。 
@@ -112,7 +116,9 @@ configure = {
     # 引擎onnx或者pytorch
     'engine': 'pytorch',
     # 模型语言
-    'schema_lang': 'zh'
+    'schema_lang': 'zh',
+    # 是否多语言
+    'multilingual': False
 }
 ```
 预测的结果如下：
